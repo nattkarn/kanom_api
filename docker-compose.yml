@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  app:
+    image: registry.gitlab.com/nattkarn/kanom/kanom:1.0.1
+    container_name: kanom
+    environment:
+      - BASE_URL=${BASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - MONGODB_URI=${MONGODB_URI}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_SSL=${EMAIL_SSL}
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads:/app/uploads
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  uploads:
