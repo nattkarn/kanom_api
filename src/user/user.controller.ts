@@ -23,8 +23,14 @@ export class UserController {
 
 
   @Post('/register')
-  create(@Body() registerDto: RegisterDTO) {
-    return this.userService.create(registerDto);
+  async create(@Body() registerDto: RegisterDTO) {
+    const created =  await this.userService.create(registerDto);
+    console.log("🚀 ~ UserController ~ create ~ created:", created)
+    if(created){
+      return 'created'
+    }else{
+      return 'user exists'
+    }
   }
 
 

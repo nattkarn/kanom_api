@@ -2,7 +2,7 @@ import { Controller, Request, Post, Res, UseGuards, Get, UnauthorizedException, 
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard'
 import { GoogleAuthGuard } from './google-auth.guard'
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 
 @Controller('auth')
 export class AuthController {

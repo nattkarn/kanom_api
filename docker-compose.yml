@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   app:
-    image: registry.gitlab.com/nattkarn/kanom/kanom:1.0.1
+    image: registry.gitlab.com/nattkarn/kanom:2.0.3
     container_name: kanom
     environment:
       - BASE_URL=${BASE_URL}

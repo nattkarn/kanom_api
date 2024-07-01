@@ -22,16 +22,16 @@ export class RegisterDTO {
     @IsOptional()
     readonly googleId: string;
 
-    @IsString()
-    @IsOptional()
-    readonly picProfile : string
+    // @IsString()
+    // @IsOptional()
+    // readonly picProfile : string
 
-    @IsBoolean()
-    @IsOptional()
-    readonly isVerify : boolean
+    // @IsBoolean()
+    // @IsOptional()
+    // readonly isVerify : boolean
 
-    @IsString()
-    @IsOptional()
-    readonly activationToken : string
+    // @IsString()
+    // @IsOptional()
+    // readonly activationToken : string
 
   }

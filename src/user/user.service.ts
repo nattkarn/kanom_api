@@ -23,29 +23,43 @@ export class UserService {
     private readonly configService: ConfigService,
   ) { } // Use UserDocument type
 
-  async create(registerDTO: RegisterDTO): Promise<User> {
+  async create(registerDTO: RegisterDTO) {
     const activationToken = uuidv4();
     const baseUrl = this.configService.get<string>('BASE_URL');
 
-    let data = {
-      ...registerDTO,
-      activationToken: activationToken
+
+    //TODO: Check User Duplicate
+
+    const isUser = await this.isUser(registerDTO.email) //if true user is duplicate
+    
+    if (isUser) {
+      console.log("🚀 ~ UserService ~ create ~ isUser:", isUser)
+      return false
+    } else {
+      let data = {
+        ...registerDTO,
+        activationToken: activationToken
+      }
+
+      const newUser = new this.userModel(data);
+      newUser.tokenCreatedAt = new Date();  // Set token creation time
+      await newUser.save();
+
+      // console.log("🚀 ~ UserService ~ create ~ newUser:", newUser)
+
+      const activationLink = `${baseUrl}/user/activation?token=${activationToken}`;
+
+      // await this.mailerService.sendMail({
+      //   to: newUser.email,
+      //   subject: 'Account Activation',
+      //   text: `Please activate your account using the following link: ${activationLink}`,
+      // });
+
+      return true
     }
 
-    const newUser = new this.userModel(data);
-    newUser.tokenCreatedAt = new Date();  // Set token creation time
-    await newUser.save();
-
-    const activationLink = `${baseUrl}/user/activation?token=${activationToken}`;
-
-    await this.mailerService.sendMail({
-      to: newUser.email,
-      subject: 'Account Activation',
-      text: `Please activate your account using the following link: ${activationLink}`,
-    });
-
-    return newUser
   }
+
 
   async activateAccount(token: string): Promise<boolean> {
     const baseUrl = this.configService.get<string>('BASE_URL');
@@ -113,6 +127,11 @@ export class UserService {
     }
     return user
 
+  }
+
+  async isUser(email: string): Promise<boolean> {
+    const user = await this.userModel.findOne({ email });
+    return !!user; // This converts the user object to a boolean, true if the user exists, false otherwise
   }
 
   async changePassword(id: string, changePasswordDTO: ChangePasswordDTO) {
@@ -210,7 +229,7 @@ export class UserService {
 
   async changePasswordFromToken(token: string, changePasswordDTO: ChangePasswordDTO) {
 
-    const user = await this.userModel.findOne({ tokenForgetPassword: token , setPasswordAllow: true });
+    const user = await this.userModel.findOne({ tokenForgetPassword: token, setPasswordAllow: true });
     if (!user) {
       throw new NotFoundException('User not found or you not allow here');
     }
@@ -243,7 +262,7 @@ export class UserService {
   async findAll() {
     // Exclude sensitive fields
     const result = await this.userModel.find().select('-password -activationToken -tokenCreatedAt -__v');
-  
+
     // Create a new dataset with non-sensitive information
     const sanitizedResult = result.map(user => ({
       ID: user._id,
@@ -253,15 +272,15 @@ export class UserService {
       picProfile: user.picProfile,
       tel: user.tel
     }));
-  
+
     return sanitizedResult;
   }
 
 
-  async findUser(id:string) {
+  async findUser(id: string) {
     // Exclude sensitive fields
     const result = await this.userModel.findById(id).select('-password -activationToken -tokenCreatedAt -__v');
-  
+
     // Create a new dataset with non-sensitive information
     const sanitizedResult = {
       ID: result._id,
@@ -271,7 +290,7 @@ export class UserService {
       picProfile: result.picProfile,
       tel: result.tel
     };
-  
+
     return sanitizedResult;
   }
 }
